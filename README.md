@@ -1,79 +1,69 @@
-# Stage274: Key Management Hardening
+# Stage275: Key Usage Policy
 
 ## Overview
 
-Stage274 introduces a minimal and clean key management model for QSP.
+Stage275 introduces explicit key usage policy for QSP.
 
-This stage focuses on how keys are protected, not only how signatures are verified.
+This stage defines:
 
-## Current Status
+- who may use keys
+- which keys may be used
+- what actions are allowed
+- what conditions must be satisfied before signing or approval
 
-- KMS: active
-- HSM: compatible
-- YubiKey: pending
-
-## What This Stage Adds
-
-- A documented key management model
-- A managed-key configuration example
-- A hardware-backed upgrade path
-- Verifiable key-management evidence
+It extends Stage274.
 
 ## Files
 
-- `docs/key_management_model.md`
-- `kms/kms_config_example.yaml`
-- `hsm/hsm_model.md`
-- `yubikey/yubikey_signing.md`
-- `tools/verify_key_management.py`
-- `out/key_management_evidence.json`
+- `policy/key_usage_policy.yaml`
+- `docs/key_usage_policy.md`
+- `tools/verify_key_usage_policy.py`
+- `out/key_usage_policy_evidence.json`
+
+## Actors
+
+- CI
+- Human reviewer
+- Future YubiKey holder
+
+## Key Classes
+
+- CI managed key
+- Human approval key
+- Future YubiKey approval key
+
+## What This Stage Adds
+
+- explicit actor separation
+- explicit signing conditions
+- explicit forbidden actions
+- future YubiKey integration path
 
 ## Evidence
 
 Run:
 
 ```bash
-python3 tools/verify_key_management.py
+python3 tools/verify_key_usage_policy.py
 
 This generates:
 
-out/key_management_evidence.json
-
-Example evidence state:
-
-KMS: active
-HSM: compatible
-YubiKey: pending
+out/key_usage_policy_evidence.json
 Security Meaning
 
-Before this stage, trust focused mainly on signatures and verification outputs.
+Before this stage, the project defined where keys are protected.
 
-Stage274 adds a new dimension:
+This stage defines how keys may be used.
 
-where keys are protected
-whether keys are exportable
-whether hardware-backed signing is available
-
-This strengthens Identity Trust and creates a path toward stronger real-world key protection.
+That means trust is no longer based only on possession of keys,
+but also on policy, approval path, and actor separation.
 
 Limitations
 
-This stage does NOT yet prove:
+This stage does NOT yet prove live hardware-token approval.
 
-live KMS-backed signing
-active HSM-backed operations
-active YubiKey signing
+YubiKey integration remains pending.
 
-Those will be added in future stages.
-
-Next Step
-
-The natural next step is Stage275:
-
-key usage policy
-who can use keys
-under what conditions
-with what approval requirements
 License
 
 MIT License

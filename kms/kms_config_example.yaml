@@ -1,2 +1,0 @@
-provider: aws_kms
-key_id: example-key-id

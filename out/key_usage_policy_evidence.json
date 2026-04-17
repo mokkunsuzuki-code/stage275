@@ -1,0 +1,41 @@
+{
+  "stage": "Stage275",
+  "policy_version": 1,
+  "status": {
+    "kms": "active",
+    "hsm": "compatible",
+    "yubikey": "pending"
+  },
+  "actors_defined": [
+    "ci",
+    "human_reviewer",
+    "yubikey_holder"
+  ],
+  "key_classes_defined": [
+    "ci_managed_key",
+    "human_approval_key",
+    "yubikey_approval_key"
+  ],
+  "forbidden_actions": [
+    "private_key_export",
+    "unsigned_release_approval",
+    "ci_key_for_human_identity_claim"
+  ],
+  "conditions_defined": [
+    "ci_signing",
+    "human_approval",
+    "yubikey_approval"
+  ],
+  "policy_rule_ids": [
+    "rule_ci_only_for_automation",
+    "rule_human_required_for_release",
+    "rule_yubikey_future_high_trust"
+  ],
+  "separation_of_duties": {
+    "ci_vs_human": true,
+    "human_vs_yubikey": true,
+    "ci_cannot_claim_human_identity": true
+  },
+  "yubikey_live": false,
+  "result": "policy_loaded_and_structured"
+}

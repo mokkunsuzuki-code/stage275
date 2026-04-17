@@ -1,0 +1,83 @@
+version: 1
+
+status:
+  kms: active
+  hsm: compatible
+  yubikey: pending
+
+actors:
+  ci:
+    allowed: true
+    description: Automated CI signing actor
+  human_reviewer:
+    allowed: true
+    description: Human approval actor
+  yubikey_holder:
+    allowed: false
+    description: Future hardware-token approval actor
+
+key_classes:
+  ci_managed_key:
+    provider: kms
+    exportable: false
+    allowed_actors:
+      - ci
+    allowed_actions:
+      - sign_ci_evidence
+      - sign_build_summary
+      - sign_verification_result
+
+  human_approval_key:
+    provider: local_or_managed
+    exportable: restricted
+    allowed_actors:
+      - human_reviewer
+    allowed_actions:
+      - approve_release
+      - approve_external_submission
+      - approve_security_claims
+
+  yubikey_approval_key:
+    provider: yubikey
+    exportable: false
+    allowed_actors:
+      - yubikey_holder
+    allowed_actions:
+      - approve_release
+      - approve_external_submission
+      - approve_high_trust_artifacts
+
+conditions:
+  ci_signing:
+    requires:
+      - workflow_success == true
+      - verification_passed == true
+
+  human_approval:
+    requires:
+      - review_completed == true
+      - artifact_digest_present == true
+
+  yubikey_approval:
+    requires:
+      - yubikey_present == true
+      - user_presence_verified == true
+      - review_completed == true
+
+policy_rules:
+  - id: rule_ci_only_for_automation
+    description: CI managed keys may only sign automation outputs
+    effect: allow
+
+  - id: rule_human_required_for_release
+    description: Human approval is required for release-level trust
+    effect: allow
+
+  - id: rule_yubikey_future_high_trust
+    description: YubiKey approval is reserved for future highest-trust operations
+    effect: pending
+
+forbidden:
+  - private_key_export
+  - unsigned_release_approval
+  - ci_key_for_human_identity_claim
